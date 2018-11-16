@@ -1,5 +1,4 @@
 import Exceptions.UserDoesNotExists;
-
 import org.junit.jupiter.api.*;
 
 /**
@@ -20,59 +19,38 @@ public class BikeRentalSystemTest {
         brs = new BikeRentalSystem(1);
     }
 
-    /**
-     * Método relativo às Equivalence Classes #ECP1V e #ECP1IV
-     *
-     * @param IDDeposit identificação do depósito da bicicleta
-     * @param IDUser identificação do utilizador
-     * @param starttime valor inicial do tempo de aluguer
-     */
     @Test
-    public void testGetBicycle(int IDDeposit, int IDUser, int starttime) {
-        //Expressão relativa ao caso de teste com output esperado:
+    public void testGetBicycle() {
+        //Expressão relativa ao caso de teste com output:
         // -> UserDoesNotExists exception
         // (colocar o ID aqui)
+        int IDUser = 66, IDDeposit = 12, startTime = 12;
         Assertions.assertThrows(UserDoesNotExists.class,
-                () -> brs.getBicycle(IDUser, IDDeposit, starttime));
+                () -> brs.getBicycle(IDDeposit, IDUser, startTime));
 
     }
 
     @Test
-    /**
-     *
-     */
     public void testReturnBicycle() {
 
     }
 
     @Test
-    /**
-     *
-     */
     public void testBicycleRentalFee() {
 
     }
 
     @Test
-    /**
-     *
-     */
     public void testVerifyCredit() {
 
     }
 
     @Test
-    /**
-     *
-     */
     public void testAddCredit() {
 
     }
 
     @Test
-    /**
-     *
-     */
     public void testRegisterUser() {
 
     }
