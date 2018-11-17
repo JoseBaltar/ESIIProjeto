@@ -33,25 +33,46 @@ public class BikeRentalSystemTest {
     @Test
     public void testReturnBicycle() {
 
+        int IDUser, IDDeposit, endtime;
+        IDUser=55; IDDeposit=55; endtime=12;
+
+
     }
 
     @Test
     public void testBicycleRentalFee() {
+
+        //rentalProgram tem de ser igual ao construtor?
+
+        int rentalProgram, starttime,endtime, nRentals;
 
     }
 
     @Test
     public void testVerifyCredit() {
 
+        int IDUser;
+        IDUser=23;
+
+
     }
 
     @Test
     public void testAddCredit() {
 
+        int IDUser, amount;
+        IDUser=55;amount=3;
+
     }
 
     @Test
     public void testRegisterUser() {
+
+        int IDUser, rentalprogram;
+        String name;
+        IDUser=55;rentalprogram=2;
+        name="Sterben";
+
 
     }
 }
