@@ -72,6 +72,23 @@ public class BikeRentalSystemTest {
 
         int IDUser, IDDeposit, endtime;
 
+        //#TC1 É necessário retornar o saldo do cliente... Como? Nasce a mesma situação do teste case mais lá em cima...
+        IDUser=55;IDDeposit=55;endtime=12;
+
+
+        //#TC2
+        IDUser=44; IDDeposit=66; endtime=13;
+        int finalIDDeposit = IDDeposit, finalIDUser = IDUser, finalEndtime = endtime;
+        Assertions.assertThrows(UserDoesNotExists.class,
+                ()->brs.getBicycle(finalIDDeposit, finalIDUser, finalEndtime));
+
+        //#TC3
+        IDUser=23; IDDeposit=77; endtime=6;
+        Assertions.assertEquals(-1,brs.returnBicycle(IDDeposit,IDUser,endtime),"Depósito deveria existir");
+
+        //#TC4
+        IDUser=66;IDDeposit=44;endtime=4;
+        Assertions.assertEquals(-1,brs.returnBicycle(IDDeposit,IDUser,endtime),"Utilizador deveria ter uma bicicleta com aluguer ativo");
 
     }
 
