@@ -151,7 +151,7 @@ public class BikeRentalSystemTest {
     }
 
     @Test
-    public void testAdicionarCreditoAoUser() throws UserAlreadyExists {
+    public void testAdicionarCreditoAoUser() {
 
         //#TC18
         int IDUser = 55, amount=3;
