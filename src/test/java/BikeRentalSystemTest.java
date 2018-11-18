@@ -39,7 +39,7 @@ public class BikeRentalSystemTest {
     public void testGetBicycleBemSucedido() throws UserDoesNotExists {
         int IDUser = 55, IDDeposit = 5, starttime = 1,
                 //num contexto real de utilização, estas variáveis já teriam sido inicializadas
-                IDLock = 1, IDBike = 1;
+                IDLock = 2, IDBike = 2;
 
         //adicionar componentes ao User para que seja possivel executar os testes
         existingUser.setCredit(5);
@@ -47,6 +47,7 @@ public class BikeRentalSystemTest {
         brs.addBicycle(IDDeposit, IDLock, IDBike);
 
         //#TC0
+        //teste falhado
         Assertions.assertEquals(starttime, existingUser.getStartRental(),
                 "Starttime sinalizado deveria ser igual ao introduzido.");
 
@@ -69,7 +70,7 @@ public class BikeRentalSystemTest {
     public void testGetBicycleMalSucedido() throws UserDoesNotExists {
         int IDUser = 55, IDDeposit = 5, starttime = 1, expected = -1,
                 //num contexto real de utilização, estas variáveis já teriam sido inicializadas
-                IDLock = 1, IDBike = 1;
+                IDLock = 2, IDBike = 2;
 
         //adicionar componentes ao User para que seja possivel executar os testes
         existingUser.setCredit(5);
@@ -111,6 +112,7 @@ public class BikeRentalSystemTest {
         //colocar a bike em aluguer ativo
         existingUser.getBike().setInUSe(true);
 
+        //teste falhado
         Assertions.assertEquals(expected,
                 brs.getBicycle(IDDeposit,IDUser,starttime),
                 "User deveria ter um aluguer já ativo. (return -1)");
@@ -249,9 +251,9 @@ public class BikeRentalSystemTest {
 
         //#TC17
         int IDUser = 55, amount=3;
-        brs.addCredit(IDUser, amount);
-
         float expected = existingUser.getCredit() + amount;
+
+        brs.addCredit(IDUser, amount);
         Assertions.assertEquals(expected, existingUser.getCredit(), "Deveria ter adicionado um montante ao existente");
 
         //#TC18
