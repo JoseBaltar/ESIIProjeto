@@ -1,12 +1,24 @@
-import org.junit.jupiter.api.*;
-
 import Exceptions.UserAlreadyExists;
 import Exceptions.UserDoesNotExists;
-import Models.User;
 import Models.Bike;
+import Models.User;
+import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
- * Faltam Adicionar os testes das classes inválidas!!
+ * --Algumas observações--
+ * <p>
+ * => Podiam ter sido adicionados mais testes de boundary values do tipo:
+ * - Verificar se existem bicicletas para alugar (getBicycle()) utilizando
+ * um conjunto com mais de uma lock, ...
+ * (Só esta a ser testado com uma lock)
+ * - Podiam ter sido verificados mais valores...
+ * <p>
+ * => A verificação de IDUser negativo em todos os métodos é redundante, uma vez que
+ * essa verificação já é feita no métodp registerUser(), fazendo com que seja 'impossível'
+ * existir um Utilizador com o ID negativo
  */
 public class BikeRentalSystemTest {
     BikeRentalSystem brs;
@@ -14,7 +26,7 @@ public class BikeRentalSystemTest {
 
     /**
      * Este método cria uma instância da classe que contém os métodos a serem testados.
-     *
+     * <p>
      * Por conveniência, também é inicializado um elemento 'User' para utilizar nos métodos de teste.
      */
     @BeforeEach
@@ -26,8 +38,8 @@ public class BikeRentalSystemTest {
 
         try {
             //adicionar um utilizador para ser utilizado nos testes
-            int IDUser=55, rentalprogram=1;
-            String name="Sterben";
+            int IDUser = 55, rentalprogram = 1;
+            String name = "Sterben";
 
             brs.registerUser(IDUser, name, rentalprogram);
             existingUser = brs.getUsers().get(0);
@@ -74,35 +86,36 @@ public class BikeRentalSystemTest {
 
         //#TC1
         Assertions.assertEquals(expected,
-                brs.getBicycle(IDDeposit,IDUser,starttime),
+                brs.getBicycle(IDDeposit, IDUser, starttime),
                 "Não deveriam existir bikes disponíveis. (return -1)");
 
         //adicionar um deposit cheio
         brs.addBicycle(IDDeposit, IDLock, IDBike);
 
         //#TC2
-        IDUser=44;
+        IDUser = 44;
         int finalIDDeposit = IDDeposit, finalIDUser = IDUser, finalStarttime = starttime;
         Assertions.assertThrows(UserDoesNotExists.class,
                 () -> brs.getBicycle(finalIDDeposit, finalIDUser, finalStarttime));
 
         //#TC3
-        IDUser=55; IDDeposit = 9;
+        IDUser = 55;
+        IDDeposit = 9;
         Assertions.assertEquals(expected,
-                brs.getBicycle(IDDeposit,IDUser,starttime),
+                brs.getBicycle(IDDeposit, IDUser, starttime),
                 "Depósito não deveria existir. (return -1)");
 
         //#TC4
         existingUser.setCredit(0);
-        IDDeposit=5;
+        IDDeposit = 5;
         Assertions.assertEquals(expected,
-                brs.getBicycle(IDDeposit,IDUser,starttime),
+                brs.getBicycle(IDDeposit, IDUser, starttime),
                 "User não deveria ter crédito. (return -1)");
 
         //#TC5
         existingUser.setCredit(5);
         //Adicionar uma bike ao User
-        Bike testBike = new Bike(IDBike+1);
+        Bike testBike = new Bike(IDBike + 1);
         existingUser.setBike(testBike);
         //colocar a bike em aluguer ativo
         existingUser.getBike().setInUSe(true);
@@ -110,7 +123,7 @@ public class BikeRentalSystemTest {
         //teste devia ter falhado.
         //o programa não deteta a bike em uso!
         Assertions.assertEquals(expected,
-                brs.getBicycle(IDDeposit,IDUser,starttime),
+                brs.getBicycle(IDDeposit, IDUser, starttime),
                 "User deveria ter um aluguer já ativo. (return -1)");
 
 
@@ -156,128 +169,295 @@ public class BikeRentalSystemTest {
         existingUser.setCredit(5);
         existingUser.setStartRental(starttime);
         //adicionar um deposit cheio
-        brs.addBicycle(IDDeposit, IDLock, IDBike+1);
+        brs.addBicycle(IDDeposit, IDLock, IDBike + 1);
 
         //#TC7
         Assertions.assertEquals(expected,
-                brs.returnBicycle(IDDeposit,IDUser,endtime),
+                brs.returnBicycle(IDDeposit, IDUser, endtime),
                 "Não deveria haver um lugar disponível para entrega. (return -1)");
 
         //adicionar um deposit vazio
-        brs.addLock(IDDeposit, IDLock+1);
+        brs.addLock(IDDeposit, IDLock + 1);
 
         //#TC8
         //retirar a bike do aluguer ativo
         existingUser.getBike().setInUSe(false);
         Assertions.assertEquals(expected,
-                brs.returnBicycle(IDDeposit,IDUser,endtime),
+                brs.returnBicycle(IDDeposit, IDUser, endtime),
                 "Bicicleta não deveria ter aluguer ativo. (return -1)");
 
         //#TC9
         existingUser.getBike().setInUSe(true);
-        IDDeposit=42;
+        IDDeposit = 42;
         Assertions.assertEquals(expected,
-                brs.returnBicycle(IDDeposit,IDUser,endtime),
+                brs.returnBicycle(IDDeposit, IDUser, endtime),
                 "O Depósito não deveria existir. (return -1)");
 
         //#TC10
-        IDUser=66; IDDeposit = 1;
+        IDUser = 66;
+        IDDeposit = 1;
         Assertions.assertEquals(expected,
-                brs.returnBicycle(IDDeposit,IDUser,endtime),
+                brs.returnBicycle(IDDeposit, IDUser, endtime),
                 "Utilizador não deveria existir. (return -1)");
 
     }
 
+    /**
+     * Método a ser testado -> 'bycicleResntalFee'
+     */
     @Test
-    public void testBicycleRentalFee() {
-        int rentalProgram, starttime, endtime, nRentals, expectedResult;
-
-        //#TC11
-        rentalProgram = 1;starttime = 2;endtime = 6; nRentals = 3;
-        expectedResult = (endtime-starttime)*brs.getRentalFee();
-        Assertions.assertEquals(expectedResult,
-                brs.bicycleRentalFee(rentalProgram,starttime,endtime,nRentals),
-                "Cálculos errados. Fórmula = (endtime - starttime) * rentalFee");
-
-        //#TC12
-        rentalProgram = 2;starttime = 5;endtime = 7; nRentals = 5;
-        expectedResult = (endtime-starttime)*brs.getRentalFee();
-        Assertions.assertEquals(expectedResult,
-                brs.bicycleRentalFee(rentalProgram,starttime,endtime,nRentals),
-                "Cálculos errados. Fórmula = (endtime - starttime) * rentalFee");
-
-        //#TC13
-        rentalProgram = 2;starttime = 5;endtime = 17; nRentals = 15;
-        expectedResult = 10*brs.getRentalFee()+((endtime-starttime)-10)*brs.getRentalFee()/2;
-        Assertions.assertEquals(expectedResult,
-                brs.bicycleRentalFee(rentalProgram,starttime,endtime,nRentals),
-                "Cálculos errados. Fórmula = 10*rentalFee + ((endtime - startime)-10)* rentalFee / 2");
-
-        //#TC14
-        rentalProgram = 2;starttime = 5;endtime = 12; nRentals = 20;
-        expectedResult = 0;
-        Assertions.assertEquals(expectedResult,
-                brs.bicycleRentalFee(rentalProgram,starttime,endtime,nRentals),
-                "Retorno deveria ser 0");
-
+    public void testCalculoBicycleRentalFee() {
+        Assertions.assertAll(
+                //#TC11
+                () -> {
+                    int rentalProgram = 1, starttime = 2,
+                            endtime = 6, nRentals = 3;
+                    int expectedResult = (endtime - starttime) * brs.getRentalFee();
+                    Assertions.assertEquals(expectedResult,
+                            brs.bicycleRentalFee(rentalProgram, starttime, endtime, nRentals),
+                            "Cálculos errados. Fórmula = (endtime - starttime) * rentalFee");
+                },
+                //#TC12
+                () -> {
+                    int rentalProgram = 2, starttime = 5,
+                            endtime = 7, nRentals = 5;
+                    int expectedResult = (endtime - starttime) * brs.getRentalFee();
+                    Assertions.assertEquals(expectedResult,
+                            brs.bicycleRentalFee(rentalProgram, starttime, endtime, nRentals),
+                            "Cálculos errados. Fórmula = (endtime - starttime) * rentalFee");
+                },
+                //#TC13
+                () -> {
+                    int rentalProgram = 2, starttime = 5,
+                            endtime = 17, nRentals = 15;
+                    int expectedResult = 10 * brs.getRentalFee() + ((endtime - starttime) - 10) * brs.getRentalFee() / 2;
+                    Assertions.assertEquals(expectedResult,
+                            brs.bicycleRentalFee(rentalProgram, starttime, endtime, nRentals),
+                            "Cálculos errados. Fórmula = 10*rentalFee + ((endtime - startime)-10)* rentalFee / 2");
+                },
+                //#TC14
+                () -> {
+                    int rentalProgram = 2, starttime = 5,
+                            endtime = 17, nRentals = 20;
+                    int expectedResult = 0;
+                    Assertions.assertEquals(expectedResult,
+                            brs.bicycleRentalFee(rentalProgram, starttime, endtime, nRentals),
+                            "Retorno deveria ser 0");
+                }
+        );
     }
 
+    /**
+     * Método a ser testado -> 'bycicleResntalFee'
+     */
+    @Test
+    public void testCalculoInvalidoBicycleRentalFee() {
+        Assertions.assertAll(
+                //#TC15
+                () -> {
+                    int rentalProgram = 2, starttime = 5,
+                            endtime = 17, nRentals = -3;
+                    int expectedResult = -1;
+                    Assertions.assertEquals(expectedResult,
+                            brs.bicycleRentalFee(rentalProgram, starttime, endtime, nRentals),
+                            "Retorno deveria ser -1(não aceitar input) (nRentals negativo)");
+                },
+                //#TC16
+                () -> {
+                    int rentalProgram = 2, starttime = 15,
+                            endtime = 5, nRentals = 3;
+                    int expectedResult = -1;
+                    Assertions.assertEquals(expectedResult,
+                            brs.bicycleRentalFee(rentalProgram, starttime, endtime, nRentals),
+                            "Retorno deveria ser -1(não aceitar input) (start>end)");
+                }
+        );
+    }
+
+    /**
+     * Método a ser testado -> "verifyCredit()"
+     */
     @Test
     public void testVerifyCredit() {
-
         int IDUser = 55;
 
-        //#TC15
-        float testCredit = 5;
-        existingUser.setCredit(testCredit);
-        Assertions.assertTrue(brs.verifyCredit(IDUser),"Crédito deveria ser positivo (retornar true)");
-
-        //#TC16
-        testCredit = 0;
-        existingUser.setCredit(testCredit);
-        Assertions.assertFalse(brs.verifyCredit(IDUser),"Crédito não deveria ser positivo (retornar false)");
-
-        //Novamente, não faz sentido adicionar um teste quando o user não existe porque nada é retornado para testar isso
-        //(o método retorna false, mas isso está relacionado com o crédito e não com o user)
-
+        Assertions.assertAll(
+                //#TC17
+                () -> {
+                    float testCredit = 5;
+                    existingUser.setCredit(testCredit);
+                    Assertions.assertTrue(brs.verifyCredit(IDUser),
+                            "Crédito deveria ser positivo (retornar true)");
+                },
+                //#TC18
+                () -> {
+                    float testCredit = 0;
+                    existingUser.setCredit(testCredit);
+                    Assertions.assertFalse(brs.verifyCredit(IDUser),
+                            "Crédito não deveria ser positivo (retornar false)");
+                }
+        );
     }
 
+    /**
+     * Método a ser testado -> "addCredit()"
+     */
     @Test
     public void testAdicionarCreditoAoUser() {
+        int IDUser = 55;
 
-        //#TC17
-        int IDUser = 55, amount=3;
-        float expected = existingUser.getCredit() + amount;
+        Assertions.assertAll(
+                //#TC19
+                () -> {
+                    int amount = 3;
+                    float expected = existingUser.getCredit() + amount;
 
-        brs.addCredit(IDUser, amount);
-        Assertions.assertEquals(expected, existingUser.getCredit(), "Deveria ter adicionado um montante ao existente");
+                    brs.addCredit(IDUser, amount);
+                    Assertions.assertEquals(expected, existingUser.getCredit(),
+                            "Deveria ter adicionado um montante ao existente " +
+                                    "(credito inicial = 0");
+                },
+                //#TC21
+                () -> {
+                    int amount = 3;
+                    existingUser.setCredit(15);
+                    float expected = existingUser.getCredit() + amount;
 
-        //#TC18
-        int amount2 = 0;
-        brs.addCredit(IDUser, amount2);
-
-        expected = existingUser.getCredit() + amount2;
-        Assertions.assertEquals(expected, existingUser.getCredit(), "Não deveria ter sido adicionado crédito");
-
-        //Não faz sentido adicionar um teste quando o user não existe porque o método é do tipo 'Void' ...
-
+                    brs.addCredit(IDUser, amount);
+                    Assertions.assertEquals(expected, existingUser.getCredit(),
+                            "Deveria ter adicionado um montante ao existente " +
+                                    "(crédito inicial > 0)");
+                }
+        );
     }
 
+    /**
+     * Método a ser testado -> "addCredit()"
+     */
     @Test
-    public void testVerificarSeUserFoiRegistado() {
-        //#TC19, método a ser testado -> "registerUser()"
-        int IDUser=60, rentalprogram=2;
-        String name="Cyrodil";
+    public void testAdicionarCreditoAoUserInvalido() {
+        int IDUser = 55;
+        Assertions.assertAll(
+                //#TC20
+                () -> {
+                    int amount = 0;
+                    float expected = existingUser.getCredit() + amount;
 
-        Assertions.assertDoesNotThrow(() -> brs.registerUser(IDUser, name, rentalprogram));
+                    brs.addCredit(IDUser, amount);
+                    Assertions.assertEquals(expected, existingUser.getCredit(),
+                            "Não deveria ter sido adicionado crédito (amount=0)");
+                },
+                //#TC22
+                () -> {
+                    int amount = -3;
+                    float expected = existingUser.getCredit();
 
-        //#TC20
-        int existingIDUser=55, existingRentalprogram=1;
-        String existingName="Sterben";
+                    brs.addCredit(IDUser, amount);
+                    Assertions.assertEquals(expected, existingUser.getCredit(),
+                            "Não deveria ter sido adicionado crédito (amount<0)");
+                }
+        );
+    }
 
-        //utilizando o mesmo utilizador inserido anteriormente
-        Assertions.assertThrows(UserAlreadyExists.class,
-                () -> brs.registerUser(existingIDUser, existingName, existingRentalprogram));
+    /**
+     * Método a ser testado -> "registerUser()"
+     */
+    @Test
+    public void testVerificarSeUserRegistaEJaExiste() {
+        Assertions.assertAll(
+                //#TC23 - Novo User
+                () -> {
+                    int IDUser = 60, rentalprogram = 2;
+                    String name = "Cyrodil";
 
+                    int finalIDUser = IDUser, finalRentalprogram = rentalprogram;
+                    String finalName = name;
+                    Assertions.assertDoesNotThrow(
+                            () -> brs.registerUser(finalIDUser, finalName, finalRentalprogram));
+                },
+                //#TC25 - User existente
+                () -> {
+                    int existingIDUser = 55, existingRentalprogram = 1;
+                    String existingName = "Sterben";
+                    //utilizando o mesmo utilizador inserido anteriormente
+                    Assertions.assertThrows(UserAlreadyExists.class,
+                            () -> brs.registerUser(existingIDUser, existingName, existingRentalprogram));
+
+                    //#TC24 - Verificar se foi adicionado
+                    Assertions.assertNotNull(findUserByID(existingIDUser),
+                            "User deveria ter sido adicionado");
+                }
+        );
+    }
+
+    /**
+     * Método a ser testado -> "registerUser()"
+     */
+    @Test
+    public void testVerificarQuandoUserNaoDeveRegistar() {
+        Assertions.assertAll(
+                //#TC26
+                () -> {
+                    int IDUser = 60, rentalprogram = 1;
+                    String name = null;
+
+                    brs.registerUser(IDUser, name, rentalprogram);
+                    Assertions.assertNull(findUserByID(IDUser),
+                            "User não deveria ter sido adicionado (name=null)");
+                },
+                //#TC27
+                () -> {
+                    int IDUser = 65, rentalprogram = 4;
+                    String name = "Jabba";
+
+                    brs.registerUser(IDUser, name, rentalprogram);
+                    Assertions.assertNull(findUserByID(IDUser),
+                            "User não deveria ter sido adicionado " +
+                                    "(rentalProgram!=1 && rentalProgram!=2)");
+                },
+                //#TC28
+                () -> {
+                    int IDUser = -10, rentalprogram = 2;
+                    String name = "Palpatine";
+
+                    brs.registerUser(IDUser, name, rentalprogram);
+                    Assertions.assertNull(findUserByName(name),
+                            "User não deveria ter sido adicionado (IDUser < 0)");
+                }
+        );
+    }
+
+    /**
+     * Encontrar um utilizador existente
+     *
+     * @param IDUser
+     * @return User - se existe, null - se não existe
+     */
+    private User findUserByID(int IDUser) {
+        int i = 0;
+        while (i < brs.getUsers().size()) {
+            if (brs.getUsers().get(i).getIDUser() == IDUser) {
+                return brs.getUsers().get(i);
+            }
+            i++;
+        }
+        return null;
+    }
+
+    /**
+     * Encontrar um utilizador existente
+     *
+     * @param name
+     * @return User - se existe, null - se não existe
+     */
+    private User findUserByName(String name) {
+        int i = 0;
+        while (i < brs.getUsers().size()) {
+            if (brs.getUsers().get(i).getName() == name) {
+                return brs.getUsers().get(i);
+            }
+            i++;
+        }
+        return null;
     }
 }
