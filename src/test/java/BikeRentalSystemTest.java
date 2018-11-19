@@ -24,15 +24,16 @@ public class BikeRentalSystemTest {
          */
         brs = new BikeRentalSystem(1);
 
-        //#TC19, método a ser testado -> "registerUser()"
-        int IDUser=55, rentalprogram=1;
-        String name="Sterben";
+        try {
+            //adicionar um utilizador para ser utilizado nos testes
+            int IDUser=55, rentalprogram=1;
+            String name="Sterben";
 
-        Assertions.assertDoesNotThrow(() -> brs.registerUser(IDUser, name, rentalprogram));
-
-        //adicionar um utilizador para ser utilizado nos testes
-        existingUser = brs.getUsers().get(0);
-
+            brs.registerUser(IDUser, name, rentalprogram);
+            existingUser = brs.getUsers().get(0);
+        } catch (UserAlreadyExists userAlreadyExists) {
+            userAlreadyExists.printStackTrace();
+        }
     }
 
     @Test
@@ -47,22 +48,16 @@ public class BikeRentalSystemTest {
         brs.addBicycle(IDDeposit, IDLock, IDBike);
 
         //#TC0
-        //teste falhado
+        Assertions.assertEquals(
+                brs.getDeposits().get(0).getLocks().get(0).getBike().getIDBike(),
+                brs.getBicycle(IDDeposit, IDUser, starttime),
+                "Deveria ter sido retornado o ID da bicicleta.");
+
+        Assertions.assertFalse(brs.getDeposits().get(0).getLocks().get(0).isInUse(),
+                "O lugar deveria ter sido libertado.");
+
         Assertions.assertEquals(starttime, existingUser.getStartRental(),
                 "Starttime sinalizado deveria ser igual ao introduzido.");
-
-        if ( brs.getDeposits().get(0).getIDDeposit() == IDDeposit) {
-            if (brs.getDeposits().get(0).getLocks().get(0).getIDLock() == IDLock) {
-
-                Assertions.assertFalse(brs.getDeposits().get(0).getLocks().get(0).isInUse(),
-                        "O lugar deveria ter sido libertado.");
-
-                Assertions.assertEquals(
-                        brs.getDeposits().get(0).getLocks().get(0).getBike().getIDBike(),
-                        brs.getBicycle(IDDeposit, IDUser, starttime),
-                        "Deveria ter sido retornado o ID da bicicleta.");
-            }
-        }
 
     }
 
@@ -112,7 +107,8 @@ public class BikeRentalSystemTest {
         //colocar a bike em aluguer ativo
         existingUser.getBike().setInUSe(true);
 
-        //teste falhado
+        //teste devia ter falhado.
+        //o programa não deteta a bike em uso!
         Assertions.assertEquals(expected,
                 brs.getBicycle(IDDeposit,IDUser,starttime),
                 "User deveria ter um aluguer já ativo. (return -1)");
@@ -269,13 +265,19 @@ public class BikeRentalSystemTest {
 
     @Test
     public void testVerificarSeUserFoiRegistado() {
+        //#TC19, método a ser testado -> "registerUser()"
+        int IDUser=60, rentalprogram=2;
+        String name="Cyrodil";
+
+        Assertions.assertDoesNotThrow(() -> brs.registerUser(IDUser, name, rentalprogram));
+
         //#TC20
-        int IDUser=55, rentalprogram=2;
-        String name="Sterben";
+        int existingIDUser=55, existingRentalprogram=1;
+        String existingName="Sterben";
 
         //utilizando o mesmo utilizador inserido anteriormente
         Assertions.assertThrows(UserAlreadyExists.class,
-                () -> brs.registerUser(IDUser, name, rentalprogram));
+                () -> brs.registerUser(existingIDUser, existingName, existingRentalprogram));
 
     }
 }
