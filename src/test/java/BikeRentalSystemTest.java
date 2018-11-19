@@ -127,8 +127,6 @@ public class BikeRentalSystemTest {
                                         "User não deveria ter crédito. (return -1)");
                             },
                             //#TC5
-                            //Test Failed!!
-                            //Código fonte com condições por verificar em falta!
                             () -> {
                                 //Adicionar uma bike ao User
                                 Bike testBike = new Bike(IDBike + 1);
@@ -136,8 +134,6 @@ public class BikeRentalSystemTest {
                                 //colocar a bike em aluguer ativo
                                 existingUser.getBike().setInUSe(true);
 
-                                //teste devia ter falhado.
-                                //o programa não deteta a bike em uso!
                                 Assertions.assertEquals(expected,
                                         brs.getBicycle(IDDeposit, IDUser, starttime),
                                         "User deveria ter um aluguer já ativo. (return -1)");
