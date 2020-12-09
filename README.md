@@ -1,3 +1,3 @@
-# ESIIProjeto
+# Projeto nº1 Engenharia de Software
 
-Primeira entrega do Projeto.
+Implementação de testes unitários a um conjunto de classes de uma aplicação, desenvolvido em Java.
